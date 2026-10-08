@@ -78,7 +78,7 @@ Usage:
   pit init --network <name|chainId> [--force]
                                   Generate Ed25519 device key under ${paths.home()} for an explicit network
                                   (supported: ${supportedNetworks()}; PIT_CHAIN_ID is accepted instead of --network)
-  pit pair                        Start pairing; print code + sign instructions
+  pit pair                        Start pairing, print the browser link, and wait for the wallet signature
   pit pair --sign --seat <id>     Start + sign with PIT_WALLET_PK (test only) + complete
   pit pair --complete --code --seat --sig --expires
   pit pair --status [--code]
@@ -596,10 +596,14 @@ async function main(argv: string[]) {
       return
     }
 
-    // default: start only + instructions
+    // default: print the browser link and wait. The page posts the signature; this process only polls status.
     const started = await pairStart(cfg)
     const seatHint = Number(argVal(args, '--seat')) || cfg.seatId || undefined
     console.log(printPairInstructions(started, seatHint ?? undefined))
+    const waitSec = Math.max(1, started.expiresAt - Math.floor(Date.now() / 1000))
+    const ok = await pairWatch(cfg, started.pairCode, waitSec)
+    console.log(ok ? 'paired' : 'not paired (timeout or expired)')
+    if (!ok) process.exitCode = 1
     return
   }
 

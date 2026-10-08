@@ -1,0 +1,45 @@
+name: Release pack
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  pack:
+    name: npm pack and checksums
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Build tarball and SHA256SUMS
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          npm pack --pack-destination dist
+          if tar -tzf dist/*.tgz | grep -E '(^|/)(\.env($|\.)|device\.json|model\.key|.*\.(pem|p12|key))$'; then
+            echo "refusing to publish a tarball that contains a secret-like path" >&2
+            exit 1
+          fi
+          ( cd dist && sha256sum -- *.tgz > SHA256SUMS )
+          echo "checksums:"
+          cat dist/SHA256SUMS
+      - name: Upload to the GitHub Release for this tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME}"
+          if ! gh release view "$tag" >/dev/null 2>&1; then
+            gh release create "$tag" --title "$tag" --notes "Install from the tarball in this release. Check SHA256SUMS before npm install -g."
+          fi
+          gh release upload "$tag" dist/*.tgz dist/SHA256SUMS --clobber

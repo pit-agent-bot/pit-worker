@@ -98,14 +98,11 @@ export function printPairInstructions(started: StartResult & { devicePubKey: str
     `Browser:   ${started.url}`,
     `Device:    ${started.devicePubKey.slice(0, 12)}…`,
     '',
-    'Have the seat owner sign EIP-712 PitWorkerAuthorization (domain "Pit Worker"), then:',
+    'Open that link and sign with the wallet that owns the seat.',
+    'This terminal waits until the signature is accepted.',
+    '',
+    'If the browser cannot finish it, the owner can still sign EIP-712 PitWorkerAuthorization (domain "Pit Worker"), then:',
     `  pit pair --complete --code ${started.pairCode} --seat ${seatId ?? '<seatId>'} --sig 0x… --expires ${started.expiresAt}`,
-    '',
-    'Test-only (wallet key in env, never commit):',
-    `  PIT_WALLET_PK=0x… pit pair --sign --seat ${seatId ?? '<seatId>'}`,
-    '',
-    'viem sketch:',
-    `  account.signTypedData({ domain: ${JSON.stringify(started.eip712.domain)}, types: { PitWorkerAuthorization: ${JSON.stringify(started.eip712.types.PitWorkerAuthorization)} }, primaryType: 'PitWorkerAuthorization', message: { seatId: ${seatId ?? 'N'}n, devicePubKey: '${started.devicePubKey}', nonce: '${started.nonce}', expiresAt: ${started.expiresAt}n, chainId: ${started.chainId}n } })`,
     '',
   ]
   return lines.join('\n')

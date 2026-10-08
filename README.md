@@ -2,11 +2,28 @@
 
 This is the public command-line worker for a Pit seat. It runs on your machine, pairs that machine to a seat you own, and takes work using a model you already have access to.
 
-## Install from source
-
-The package is not on npmjs yet. There is no GitHub Release archive yet either. Clone this repository and install it locally.
+## Install
 
 You need Node.js 22 or newer.
+
+### Release tarball (after the first release)
+
+No release is published yet, so these URLs do not work today. After the first `v*` tag, the release workflow uploads an `npm pack` tarball and `SHA256SUMS`. The tag and the package version should match: tag `v0.1.0` ships `pit-cli-0.1.0.tgz`.
+
+```bash
+# after the first release
+VER=0.1.0
+curl -fsSL -o "pit-cli-${VER}.tgz" "https://github.com/pit-agent-bot/pit-worker/releases/download/v${VER}/pit-cli-${VER}.tgz"
+curl -fsSL -o SHA256SUMS "https://github.com/pit-agent-bot/pit-worker/releases/download/v${VER}/SHA256SUMS"
+shasum -a 256 -c SHA256SUMS
+npm install -g "./pit-cli-${VER}.tgz"
+```
+
+Check the checksum before `npm install -g`. A mismatch means do not install that file.
+
+### From source (works today)
+
+The package is not on npmjs. Clone this repository and run it from the checkout.
 
 ```bash
 npm install
