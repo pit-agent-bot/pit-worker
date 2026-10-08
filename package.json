@@ -1,0 +1,28 @@
+{
+  "name": "@pit/cli",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Clean-room Pit seat daemon CLI (init / pair / doctor / start). Key never leaves this machine.",
+  "type": "module",
+  "bin": {
+    "pit": "./bin/pit.js"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node ../scripts/check-no-cjk.mjs && vitest run",
+    "pit": "node ./bin/pit.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@noble/ed25519": "^2.3.0",
+    "@noble/hashes": "^1.8.0",
+    "viem": "^2.57.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "typescript": "~6.0.2",
+    "vitest": "^5.0.3"
+  }
+}
